@@ -6,7 +6,7 @@ module.exports = {getAll, save, getOne, update, delNacl};
 
 //GET /Nacl operationId
 function getAll(req, res, next) {
-  res.json({ Nacls: db.find()});
+  res.json({ nacls: db.find()});
 }
 //POST /Nacl operationId
 function save(req, res, next) {

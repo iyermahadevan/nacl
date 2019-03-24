@@ -26,7 +26,7 @@ paths:
       description: add a new nacl to the list
       # nacl info to be stored
       parameters:
-        - name: ruleNumber
+        - name: title
           description: Nacl properties
           in: body
           required: true
@@ -85,7 +85,7 @@ paths:
           type: string
           in: path
           required: true
-        - name: ruleNumber
+        - name: title
           description: Nacl properties
           in: body
           required: true
@@ -126,6 +126,7 @@ definitions:
   GetNaclResponse:
       required:
         - id
+        - title
         - cidrBlock
         - egress
         - fromPort
@@ -136,10 +137,12 @@ definitions:
       properties:
         id:
           type: string
+        title: 
+          type: string
         cidrBlock: 
           type: string
         egress:
-          type: number
+          type: string
         fromPort:
           type: number
         toPort:
@@ -153,28 +156,40 @@ definitions:
   Nacl:
     type: object
     properties:
+      title: 
+        type: string
+        description: task object name
+        example: "title1"
       cidrBlock: 
         type: string
         description: task object name
+        example: "0.0.0.0/0"
       egress:
-        type: number
+        type: string
         description: task object name
+        example: false
       fromPort:
         type: number
         description: task object name
+        example: 0
       toPort:
         type: number
         description: task object name
+        example: 0
       protocol:
         type: number
         description: task object name
+        example: 6
       ruleAction:
         type: string
         description: task object name
+        example: "allow"
       ruleNumber:
         type: number
         description: task object name
+        example: 100
     required:
+      - title
       - cidrBlock
       - egress
       - fromPort
@@ -194,10 +209,12 @@ definitions:
           properties:
             id:
               type: string
+            title: 
+              type: string
             cidrBlock: 
               type: string
             egress:
-              type: number
+              type: string
             fromPort:
               type: number
             toPort:
