@@ -142,7 +142,7 @@ definitions:
         cidrBlock: 
           type: string
         egress:
-          type: string
+          type: boolean
         fromPort:
           type: number
         toPort:
@@ -163,15 +163,12 @@ definitions:
       cidrBlock: 
         type: string
         description: task object name
-        example: "0.0.0.0/0"
       egress:
-        type: string
+        type: boolean
         description: task object name
-        example: false
       fromPort:
         type: number
         description: task object name
-        example: 0
       toPort:
         type: number
         description: task object name
@@ -179,19 +176,25 @@ definitions:
       protocol:
         type: number
         description: task object name
-        example: 6
       ruleAction:
         type: string
         description: task object name
-        example: "allow"
+        enum: [allow, deny]
       ruleNumber:
         type: number
         description: task object name
-        example: 100
+    example:
+      title: "title1"
+      cidrBlock: "0.0.0.0/0"
+      egress: false
+      fromPort: 80
+      toPort: 80
+      protocol: 6
+      ruleAction: "allow"
+      ruleNumber: 100
     required:
       - title
       - cidrBlock
-      - egress
       - fromPort
       - toPort
       - protocol
@@ -214,7 +217,7 @@ definitions:
             cidrBlock: 
               type: string
             egress:
-              type: string
+              type: boolean
             fromPort:
               type: number
             toPort:

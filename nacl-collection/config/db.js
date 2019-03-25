@@ -1,6 +1,15 @@
 'use strict;'
 //Include crypto to generate the nacl id
 var crypto = require('crypto');
+var NACLImpl = require('./naclImpl.js');
+
+var naclImpl = new NACLImpl();
+var rules = []
+var p = naclImpl.getRules();
+p.then (
+    result => { console.log('updated rules'); rules = result;},
+    error => { console.log('getRules error:', error)}
+)
 
 module.exports = function() {
     return {
@@ -8,15 +17,53 @@ module.exports = function() {
         /*
          * Save the nacl inside the "db".
          */
+
+        refresh() {
+            this.naclList = [];
+            for(var i = 0; i < rules.length; i++) {
+                var rule = rules[i];
+                var fromPort = 0;
+                var toPort = 0;
+                if(typeof rule.PortRange != 'undefined') {
+                    fromPort = rule.PortRange.From;
+                    toPort = rule.PortRange.To;
+                }
+
+               var nacl = { title:  rule.RuleNumber.toString(),
+                    cidrBlock: rule.CidrBlock,
+                    fromPort: fromPort,
+                    toPort: toPort,
+                    protocol: parseInt(rule.Protocol),
+                    ruleAction: rule.RuleAction,
+                    ruleNumber: rule.RuleNumber };
+                nacl.id = crypto.randomBytes(20).toString('hex'); // fast enough for our purpose
+                this.naclList.push(nacl);
+            }
+        },
+
         save(nacl) {
             nacl.id = crypto.randomBytes(20).toString('hex'); // fast enough for our purpose
             this.naclList.push(nacl);
+            var rule = { 
+                CidrBlock: nacl.cidrBlock,
+                Egress: nacl.egress,
+                PortRange: {
+                    From: nacl.fromPort, 
+                    To: nacl.toPort
+                },
+                Protocol: nacl.protocol.toString(),
+                RuleAction: nacl.ruleAction,
+                RuleNumber: nacl.ruleNumber
+            };
+            // naclImpl.createRule(rule)
+            console.log('naclImpl.createRule rule:', rule)
             return 1;            
         },
         /*
          * Retrieve a nacl with a given id or return all the nacls if the id is undefined.
          */
         find(id) {
+            this.refresh();
             if(id) {
                 return this.naclList.find(element => {
                         return element.id === id;
@@ -30,13 +77,17 @@ module.exports = function() {
          */
         remove(id) {
             var found = 0;
+            var ruleNumber = -1;
             this.naclList = this.naclList.filter(element => {
                     if(element.id === id) {
                         found = 1;
+                        ruleNumber = element.ruleNumber;
                     }else {
                         return element.id !== id;
                     }
                 });
+            console.log('naclImpl.deleteRule rule:', rule)
+            // deleteResponse = await naclImpl.deleteRule(ruleNumber);
             return found;            
         },
         /*
@@ -47,15 +98,16 @@ module.exports = function() {
                 return element.id === id;
             });
             if(naclIndex !== -1) {
-                this.naclList[naclIndex].title = nacl.title;
-                this.naclList[naclIndex].cidrBlock = nacl.cidrBlock
-                this.naclList[naclIndex].egress = nacl.egress
-                this.naclList[naclIndex].fromPort = nacl.fromPort
-                this.naclList[naclIndex].toPort = nacl.toPort
-                this.naclList[naclIndex].protocol = nacl.protocol
-                this.naclList[naclIndex].ruleAction = nacl.uleAction
-                this.naclList[naclIndex].ruleNumber = nacl.ruleNumber
-          
+                var e = this.naclList[naclIndex];
+                e.title = nacl.title;
+                e.cidrBlock = nacl.cidrBlock
+                e.egress = nacl.egress
+                e.fromPort = nacl.fromPort
+                e.toPort = nacl.toPort
+                e.protocol = nacl.protocol
+                e.ruleAction = nacl.ruleAction
+                e.ruleNumber = nacl.ruleNumber
+                this.save(e)
                 return 1;
             }else {
                 return 0;
