@@ -14,11 +14,15 @@ p.then (
 module.exports = function() {
     return {
         naclList : [],
+        refreshDone : false,
         /*
          * Save the nacl inside the "db".
          */
 
         refresh() {
+            if(this.refreshDone)
+                return;
+            this.refreshDone = true;
             this.naclList = [];
             for(var i = 0; i < rules.length; i++) {
                 var rule = rules[i];
@@ -89,7 +93,7 @@ module.exports = function() {
                         return element.id !== id;
                     }
                 });
-            console.log('naclImpl.deleteRule rule:', rule)
+            console.log('naclImpl.deleteRule ruleNumber:', ruleNumber);
             naclImpl.deleteRule(ruleNumber);
             return found;            
         },
