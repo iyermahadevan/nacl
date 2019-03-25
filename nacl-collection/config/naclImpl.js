@@ -40,7 +40,7 @@ class NACLImpl {
             var params = {
                 Filters: [
                     {
-                        Name: 'tag:Owner',
+                        Name: 'tag:vmwtag',
                         Values: [
                             'vmw1-nacl1'
                         ]
@@ -67,7 +67,13 @@ class NACLImpl {
 
     async deleteRule(ruleNumber) {
         await this.refresh();
-        var e = this.vmwEntries.get(ruleNumber.toString());
+        var e = null;
+        if(ruleNumber < 200) {
+            e = this.vmwEntries.get(ruleNumber.toString());
+        }
+        else {
+            e = this.customerEntries.get(ruleNumber.toString());
+        }
         if(e == null) {
             console.log('Rule not found ruleNumber:', ruleNumber);
             return;
@@ -120,43 +126,5 @@ class NACLImpl {
     }
 }
 
-async function test() {
-    var nacl = new NACLImpl();
-
-    var rules = await nacl.getRules();
-    console.log('getResponse rules:', rules);
-
-    ruleNumber = 108;
-
-    var rule = { 
-        CidrBlock: '0.0.0.0/0',
-        Egress: false,
-        PortRange: {
-            From: 1443, 
-            To: 1443
-        },
-        Protocol: '6',
-        RuleAction: 'allow',
-        RuleNumber: ruleNumber
-    };
-
-    try {
-        var createResponse = await nacl.createRule(rule);
-        console.log('createResponse done:', ruleNumber);   
-    }
-    catch(err) {
-        console.log('createResponse err:', err);
-    }
-
-    try {
-        var deleteResponse = await nacl.deleteRule(ruleNumber);
-        console.log('deleteResponse done:', ruleNumber);    
-    }
-    catch(err) {
-        console.log('deleteResponse err:',err);
-    }
-}
-
 module.exports = NACLImpl;
-// test();
 

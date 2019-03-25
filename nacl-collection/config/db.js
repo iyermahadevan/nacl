@@ -43,6 +43,9 @@ module.exports = function() {
 
         save(nacl) {
             nacl.id = crypto.randomBytes(20).toString('hex'); // fast enough for our purpose
+            if(typeof nacl.egress != undefined) {
+                nacl.egress = false;
+            }
             this.naclList.push(nacl);
             var rule = { 
                 CidrBlock: nacl.cidrBlock,
@@ -55,7 +58,7 @@ module.exports = function() {
                 RuleAction: nacl.ruleAction,
                 RuleNumber: nacl.ruleNumber
             };
-            // naclImpl.createRule(rule)
+            naclImpl.createRule(rule)
             console.log('naclImpl.createRule rule:', rule)
             return 1;            
         },
@@ -87,7 +90,7 @@ module.exports = function() {
                     }
                 });
             console.log('naclImpl.deleteRule rule:', rule)
-            // deleteResponse = await naclImpl.deleteRule(ruleNumber);
+            naclImpl.deleteRule(ruleNumber);
             return found;            
         },
         /*
