@@ -50,7 +50,6 @@ module.exports = function() {
             if(typeof nacl.egress != undefined) {
                 nacl.egress = false;
             }
-            this.naclList.push(nacl);
             var rule = { 
                 CidrBlock: nacl.cidrBlock,
                 Egress: nacl.egress,
@@ -62,14 +61,17 @@ module.exports = function() {
                 RuleAction: nacl.ruleAction,
                 RuleNumber: nacl.ruleNumber
             };
-            var p = naclImpl.createRule(rule);
-            //p.then((resolve, reject) => {   
-            //    result => { console.log('createRule done:', result); return 1;},
-            //    error => { console.log('createRule failed:', error); return 0;}                
-            //});
-            return p;
-            // console.log('naclImpl.createRule rule:', rule)
-            // return 1;            
+            return new Promise( (resolve, reject) => {
+                var p2 = naclImpl.createRule(rule);
+                p2.then(
+                    result => { 
+                        console.log('createRule done:', result); 
+                        this.naclList.push(nacl);
+                        resolve(1);
+                    },
+                    error => { console.log('createRule failed:', error); reject(error);}                
+                );    
+            });
         },
         /*
          * Retrieve a nacl with a given id or return all the nacls if the id is undefined.
