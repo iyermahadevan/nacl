@@ -62,9 +62,14 @@ module.exports = function() {
                 RuleAction: nacl.ruleAction,
                 RuleNumber: nacl.ruleNumber
             };
-            naclImpl.createRule(rule)
-            console.log('naclImpl.createRule rule:', rule)
-            return 1;            
+            var p = naclImpl.createRule(rule);
+            //p.then((resolve, reject) => {   
+            //    result => { console.log('createRule done:', result); return 1;},
+            //    error => { console.log('createRule failed:', error); return 0;}                
+            //});
+            return p;
+            // console.log('naclImpl.createRule rule:', rule)
+            // return 1;            
         },
         /*
          * Retrieve a nacl with a given id or return all the nacls if the id is undefined.

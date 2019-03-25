@@ -10,7 +10,15 @@ function getAll(req, res, next) {
 }
 //POST /Nacl operationId
 function save(req, res, next) {
-    res.json({success: db.save(req.body), description: "Nacl added to the list!"});
+    var p = db.save(req.body);
+    p.then( 
+        result => { 
+            res.json({success: 1, description: "Nacl added to the list!"})
+        },
+        error => { 
+            res.json({success: 0, description: error.toString()})
+        }                
+    );
 }
 //GET /Nacl/{id} operationId
 function getOne(req, res, next) {
