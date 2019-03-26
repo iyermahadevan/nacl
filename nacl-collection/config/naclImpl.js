@@ -154,9 +154,9 @@ class NACLImpl {
                 continue;
             if(!this.matchesPortRange(r.PortRange, rule.PortRange))
                 continue;
-            return true;
+            return r.RuleNumber;
         }
-        return false;
+        return -1;
     }
     /* Check the following conditions
     * 1. deny rule in 100s blocks allow rule in 200s
@@ -165,24 +165,24 @@ class NACLImpl {
     * 4. allow rule in 200s masked by deny rule in 100s 
     */
     checkConflict(rule) {
-        var conflict = false;
+        var matchingRuleNumber = -1;
         if(rule.RuleNumber < 200) { // Provider rule
             if(rule.RuleAction == "deny") { // Case #1
-                conflict = this.matchesRule(this.tenantEntries, "allow", rule);
+                matchingRuleNumber = this.matchesRule(this.tenantEntries, "allow", rule);
             }
             else { // Case #2
-                conflict = this.matchesRule(this.tenantEntries, "deny", rule);
+                matchingRuleNumber = this.matchesRule(this.tenantEntries, "deny", rule);
             }
         }
         else { // Tenant Rule
             if(rule.RuleAction == "deny") { // Case #3
-                conflict = this.matchesRule(this.providerEntries, "allow", rule);
+                matchingRuleNumber = this.matchesRule(this.providerEntries, "allow", rule);
             }
             else { // Case #4
-                conflict = this.matchesRule(this.providerEntries, "deny", rule);
+                matchingRuleNumber = this.matchesRule(this.providerEntries, "deny", rule);
             }
         }
-        return conflict;
+        return matchingRuleNumber;
     }
 }
 

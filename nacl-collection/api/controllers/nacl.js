@@ -34,10 +34,11 @@ function getOne(req, res, next) {
 function check(req, res, next) {
     var id = req.swagger.params.id.value; //req.swagger contains the path parameters
     var Nacl = req.body;
-    if(db.check(id, Nacl)){
+    var conflictRuleNumber = db.check(id, Nacl);
+    if(conflictRuleNumber == -1){
         res.json({success: 1, description: "Nacl check ok!"});
     }else{
-        res.json({success: 0, description: "Nacl check failed!"});
+        res.json({success: 0, description: "Nacl conflict check ruleNumber:" + conflictRuleNumber.toString()});
     }
 
 }

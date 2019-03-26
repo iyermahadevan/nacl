@@ -145,4 +145,4 @@ async function testCheck(ip) {
 
 var ip = "54.212.76.29";
 // test(ip);
-// testCheck(ip);
+testCheck(ip);

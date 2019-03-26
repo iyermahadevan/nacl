@@ -49,11 +49,7 @@ module.exports = function() {
             }
         },
 
-        /*
-         * Save the nacl inside the "db".
-         */
-        save(nacl) {
-            this.refresh();
+        formatRule(nacl) {
             nacl.id = crypto.randomBytes(20).toString('hex'); // fast enough for our purpose
             if(typeof nacl.egress != undefined) {
                 nacl.egress = false;
@@ -69,6 +65,15 @@ module.exports = function() {
                 RuleAction: nacl.ruleAction,
                 RuleNumber: nacl.ruleNumber
             };
+            return rule;
+        },
+
+        /*
+         * Save the nacl inside the "db".
+         */
+        save(nacl) {
+            this.refresh();
+            var rule = this.formatRule(nacl);
             return new Promise( (resolve, reject) => {
                 var p2 = naclImpl.createRule(rule);
                 p2.then(
@@ -120,23 +125,8 @@ module.exports = function() {
          */
         check(id, nacl) {
             this.refresh();
-            var naclIndex = this.naclList.findIndex(element => {
-                return element.id === id;
-            });
-            if(naclIndex !== -1) {
-                var e = this.naclList[naclIndex];
-                e.title = nacl.title;
-                e.cidrBlock = nacl.cidrBlock
-                e.egress = nacl.egress
-                e.fromPort = nacl.fromPort
-                e.toPort = nacl.toPort
-                e.protocol = nacl.protocol
-                e.ruleAction = nacl.ruleAction
-                e.ruleNumber = nacl.ruleNumber
-                return 1;
-            }else {
-                return 0;
-            }
+            var rule = this.formatRule(nacl);
+            return naclImpl.checkConflict(rule)
         }        
     }
 }; 
