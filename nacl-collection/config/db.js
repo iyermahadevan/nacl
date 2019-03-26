@@ -107,7 +107,7 @@ module.exports = function() {
         /*
          * Update a nacl with the given id
          */
-        update(id, nacl) {
+        check(id, nacl) {
             var naclIndex = this.naclList.findIndex(element => {
                 return element.id === id;
             });
@@ -121,7 +121,7 @@ module.exports = function() {
                 e.protocol = nacl.protocol
                 e.ruleAction = nacl.ruleAction
                 e.ruleNumber = nacl.ruleNumber
-                this.save(e)
+                // this.save(e)
                 return 1;
             }else {
                 return 0;

@@ -76,8 +76,8 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
     put:
-      operationId: update
-      description: update a nacl
+      operationId: check
+      description: check a nacl, title has to be add or delete
       # define the parameters
       parameters:
         - name: id

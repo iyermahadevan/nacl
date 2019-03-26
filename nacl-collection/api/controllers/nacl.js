@@ -2,7 +2,7 @@
 // Include our "db"
 var db = require('../../config/db')();
 // Exports all the functions to perform on the db
-module.exports = {getAll, save, getOne, update, delNacl};
+module.exports = {getAll, save, getOne, check, delNacl};
 
 //GET /Nacl operationId
 function getAll(req, res, next) {
@@ -31,10 +31,10 @@ function getOne(req, res, next) {
     }        
 }
 //PUT /Nacl/{id} operationId
-function update(req, res, next) {
+function check(req, res, next) {
     var id = req.swagger.params.id.value; //req.swagger contains the path parameters
     var Nacl = req.body;
-    if(db.update(id, Nacl)){
+    if(db.check(id, Nacl)){
         res.json({success: 1, description: "Nacl updated!"});
     }else{
         res.status(204).send();
