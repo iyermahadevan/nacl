@@ -35,9 +35,9 @@ function check(req, res, next) {
     var id = req.swagger.params.id.value; //req.swagger contains the path parameters
     var Nacl = req.body;
     if(db.check(id, Nacl)){
-        res.json({success: 1, description: "Nacl updated!"});
+        res.json({success: 1, description: "Nacl check ok!"});
     }else{
-        res.status(204).send();
+        res.json({success: 0, description: "Nacl check failed!"});
     }
 
 }
