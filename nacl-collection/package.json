@@ -8,10 +8,11 @@
   "license": "",
   "main": "app.js",
   "dependencies": {
+    "aws-sdk": "^2.427.0",
+    "cidr-overlap": "0.0.4",
     "crypto": "^1.0.1",
     "express": "^4.12.3",
-    "swagger-express-mw": "^0.1.0",
-    "aws-sdk": "^2.427.0"
+    "swagger-express-mw": "^0.1.0"
   },
   "devDependencies": {
     "should": "^7.1.0",
