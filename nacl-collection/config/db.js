@@ -3,6 +3,8 @@
 var crypto = require('crypto');
 var NACLImpl = require('./naclImpl.js');
 
+// This will initialize a global rules object once asynchronously
+// The rules are used in the refresh method to update the local cache
 var naclImpl = new NACLImpl();
 var rules = []
 var p = naclImpl.getRules();
@@ -15,10 +17,10 @@ module.exports = function() {
     return {
         naclList : [],
         refreshDone : false,
-        /*
-         * Save the nacl inside the "db".
-         */
 
+        /*
+         * Refresh the local cache with the data from the NACL list
+         */
         refresh() {
             if(this.refreshDone)
                 return;
@@ -33,7 +35,9 @@ module.exports = function() {
                     toPort = rule.PortRange.To;
                 }
 
-               var nacl = { title:  rule.RuleNumber.toString(),
+               var nacl = { 
+                    title:  rule.RuleNumber.toString(),
+                    egress: rule.Egress,
                     cidrBlock: rule.CidrBlock,
                     fromPort: fromPort,
                     toPort: toPort,
@@ -45,7 +49,11 @@ module.exports = function() {
             }
         },
 
+        /*
+         * Save the nacl inside the "db".
+         */
         save(nacl) {
+            this.refresh();
             nacl.id = crypto.randomBytes(20).toString('hex'); // fast enough for our purpose
             if(typeof nacl.egress != undefined) {
                 nacl.egress = false;
@@ -69,7 +77,10 @@ module.exports = function() {
                         this.naclList.push(nacl);
                         resolve(1);
                     },
-                    error => { console.log('createRule failed:', error); reject(error);}                
+                    error => { 
+                        console.log('createRule failed:', error); 
+                        reject(error);
+                    }                
                 );    
             });
         },
@@ -96,18 +107,19 @@ module.exports = function() {
                     if(element.id === id) {
                         found = 1;
                         ruleNumber = element.ruleNumber;
+                        console.log('naclImpl.deleteRule ruleNumber:', ruleNumber);
+                        naclImpl.deleteRule(ruleNumber);            
                     }else {
                         return element.id !== id;
                     }
                 });
-            console.log('naclImpl.deleteRule ruleNumber:', ruleNumber);
-            naclImpl.deleteRule(ruleNumber);
             return found;            
         },
         /*
-         * Update a nacl with the given id
+         * Check a nacl with the given id
          */
         check(id, nacl) {
+            this.refresh();
             var naclIndex = this.naclList.findIndex(element => {
                 return element.id === id;
             });
@@ -121,7 +133,6 @@ module.exports = function() {
                 e.protocol = nacl.protocol
                 e.ruleAction = nacl.ruleAction
                 e.ruleNumber = nacl.ruleNumber
-                // this.save(e)
                 return 1;
             }else {
                 return 0;
